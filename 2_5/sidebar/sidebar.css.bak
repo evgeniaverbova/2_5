@@ -1,0 +1,19 @@
+.sidebar {
+  min-width: 260px;
+}
+
+/* Стили для элементов списка комнат */
+.room-list li {
+  padding: 8px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.room-list li:hover {
+  background-color: #1e293b; /* slate-800 */
+  transform: translateX(2px);
+}
+
+.room-list li.active {
+  background-color: #4f46e5; /* indigo-600 */
+  font-weight: 500;
+}

@@ -1,0 +1,40 @@
+
+<template x-if="accessToken">
+  <div class="sidebar p-4 bg-slate-900 text-slate-50 flex flex-col gap-4">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg font-semibold tracking-tight">Rooms</h2>
+      <span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 uppercase">
+        matrix.org
+      </span>
+    </div>
+    <ul class="room-list space-y-1 px-1 flex-1 overflow-y-auto">
+      <template x-for="room in rooms" :key="room.roomId">
+        <li
+          @click="switchRoom(room.roomId)"
+          :class="{ 'active': room.roomId === roomId }"
+          class="cursor-pointer rounded-lg text-sm flex items-center justify-between">
+          <span class="truncate" x-text="room.name || room.roomId"></span>
+        </li>
+      </template>
+    </ul>
+    <div class="mt-2 pt-3 border-t border-slate-800">
+      <label class="block text-[11px] font-semibold text-slate-400 mb-1 uppercase tracking-wide">
+        Create new room
+      </label>
+      <input x-model="newRoomName"
+             placeholder="New room name"
+             class="border border-slate-700 bg-slate-800/60 text-slate-50 placeholder-slate-500 text-xs p-2 w-full mb-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
+      <input x-model="inviteUser"
+             placeholder="Invite user (optional, e.g. @user:matrix.org)"
+             class="border border-slate-700 bg-slate-800/60 text-slate-50 placeholder-slate-500 text-xs p-2 w-full mb-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent">
+      <button @click="createRoom()"
+              class="bg-indigo-500 text-white text-xs py-2 w-full rounded-lg hover:bg-indigo-600 active:scale-[0.99] transition font-medium shadow-md shadow-indigo-500/40">
+        Create Room
+      </button>
+      <p x-show="newRoomId"
+         class="text-[11px] text-slate-400 mt-2 break-all">
+        Room ID: <span x-text="newRoomId"></span>
+      </p>
+    </div>
+  </div>
+</template>

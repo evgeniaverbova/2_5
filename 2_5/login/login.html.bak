@@ -1,0 +1,40 @@
+<template x-if="!accessToken">
+  <div class="login-card max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+    <h2 class="text-2xl font-bold mb-2 text-slate-900 tracking-tight">Welcome back 👋</h2>
+    <p class="text-sm text-slate-500 mb-6">
+      Login with your Matrix account to start chatting.
+    </p>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">
+          Username (e.g., @user:matrix.org)
+        </label>
+        <input x-model="username"
+               placeholder="@user:matrix.org"
+               class="border border-slate-200 p-2.5 w-full rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/70 focus:border-transparent bg-slate-50">
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">
+          Password
+        </label>
+        <input x-model="password"
+               type="password"
+               placeholder="••••••••"
+               class="border border-slate-200 p-2.5 w-full rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/70 focus:border-transparent bg-slate-50">
+      </div>
+
+      <button @click="login()"
+              class="w-full inline-flex items-center justify-center bg-indigo-500 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-600 active:scale-[0.99] transition shadow-md shadow-indigo-500/30">
+        Login
+      </button>
+
+      <p x-text="error" class="text-xs text-red-500 mt-2 min-h-[1rem]"></p>
+
+      <p class="text-[11px] text-slate-400 mt-4">
+        Your credentials are sent directly to matrix.org over HTTPS.
+      </p>
+    </div>
+  </div>
+</template>
