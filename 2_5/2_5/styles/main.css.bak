@@ -1,0 +1,18 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Общий контейнер чата */
+.chat-container {
+  min-height: 80vh;
+}
+
+/* Правая часть (основная область) */
+.chat-area {
+  flex-grow: 1;
+}
+
+/* Текстовое поле ввода сообщения */
+.message-input {
+  min-height: 80px;
+}

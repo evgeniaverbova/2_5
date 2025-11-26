@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Matrix Chat</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs" defer></script>
+
+  <script src="./login/login.js"></script>
+  <script src="./sidebar/sidebar.js"></script>
+  <script src="./chat/chat.js"></script>
+
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./login/login.css">
+  <link rel="stylesheet" href="./sidebar/sidebar.css">
+</head>
+
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+  <div x-data="chatApp()"
+       class="chat-container bg-white rounded-2xl shadow-2xl flex w-full max-w-6xl overflow-hidden border border-slate-200">
+
+    <div id="sidebar-container"></div>
+
+    <div class="chat-area flex flex-col">
+
+      <header class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-indigo-500/5 to-sky-500/5">
+        <div class="flex flex-col">
+          <h1 class="text-xl font-semibold text-slate-900 tracking-tight">
+            Matrix Chat
+          </h1>
+          <p class="text-xs text-slate-500 mt-1" x-show="userId" x-text="userId"></p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span x-show="accessToken"
+                class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Online
+          </span>
+          <button x-show="accessToken"
+                  @click="
+                    accessToken='';
+                    rooms=[];
+                    messages=[];
+                    roomId='';
+                    username='';
+                    password='';
+                  "
+                  class="text-xs font-medium text-slate-500 hover:text-slate-900 transition">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <main class="flex-1 flex flex-col">
+
+        <div id="login-container" class="flex-1 flex items-center justify-center px-6 py-8"></div>
+
+        <template x-if="accessToken">
+          <div class="flex-1 flex flex-col h-full">
+
+            <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-slate-50">
+              <template x-if="messages.length === 0">
+                <p class="text-sm text-slate-400 text-center mt-10">
+                  No messages yet. Say hi to kick things off 👋
+                </p>
+              </template>
+
+              <template x-for="message in messages" :key="message.id">
+                <div class="flex"
+                     :class="message.sender === userId ? 'justify-end' : 'justify-start'">
+                  <div class="max-w-[70%] rounded-2xl px-4 py-3 text-sm shadow-sm"
+                       :class="message.sender === userId
+                         ? 'bg-indigo-500 text-white rounded-br-sm'
+                         : 'bg-white text-slate-800 border border-slate-100 rounded-bl-sm'">
+
+                    <p class="font-semibold text-[11px] mb-1 opacity-80" x-text="message.sender"></p>
+                    <p class="leading-relaxed whitespace-pre-wrap" x-text="message.body"></p>
+                    <p class="text-[10px] mt-1 opacity-60 text-right"
+                       x-text="new Date(message.ts).toLocaleTimeString()"></p>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <div class="border-t border-slate-200 bg-white px-4 py-3">
+              <div class="flex items-end gap-3">
+                <textarea x-model="newMessage"
+                          @keydown.enter.prevent="sendMessage()"
+                          placeholder="Type a message and press Enter…"
+                          class="message-input flex-1 resize-none border border-slate-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/70 focus:border-transparent bg-slate-50"></textarea>
+
+                <button @click="sendMessage()"
+                        class="inline-flex items-center justify-center px-4 py-3 rounded-full bg-indigo-500 text-white text-sm font-medium shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 active:scale-95 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2.94 2.94a1.5 1.5 0 0 1 1.53-.37l12 4a1.5 1.5 0 0 1 0 2.86l-12 4A1.5 1.5 0 0 1 2 12.99V11l7-1-7-1V3.01a1.5 1.5 0 0 1 .94-1.07z" />
+                  </svg>
+                </button>
+              </div>
+
+              <p x-show="error" x-text="error" class="text-xs text-red-500 mt-2"></p>
+            </div>
+
+          </div>
+        </template>
+      </main>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('./login/login.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('login-container').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading login:', error));
+
+      fetch('./sidebar/sidebar.html')
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('sidebar-container').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading sidebar:', error));
+    });
+
+    function chatApp() {
+      return {
+        username: '',
+        password: '',
+        accessToken: '',
+        userId: '',
+        roomId: '',
+        joinRoomId: '',
+        newRoomName: '',
+        newRoomId: '',
+        rooms: [],
+        messages: [],
+        newMessage: '',
+        inviteUser: '',
+        error: '',
+        lastSyncToken: '',
+
+        login,
+        createRoom,
+        fetchRoomsWithNames,
+        switchRoom,
+        getRoomName,
+        fetchMessages,
+        sendMessage,
+      }
+    }
+  </script>
+
+</body>
+</html>
